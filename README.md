@@ -70,7 +70,10 @@ idx = tversky( a, b, {
 // returns 
 ```
 
-__NOTE__: the module defines `a` and `b` as sequences, rather than sets, to facilitate more general application. Internally, unique sets are extracted from the sequences, and, from these sets, the index is computed.
+
+## Notes
+
+The module defines `a` and `b` as sequences, rather than sets, to facilitate more general application. Internally, unique sets are extracted from the sequences, and, from these sets, the index is computed.
 
 
 ## Examples
