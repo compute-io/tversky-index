@@ -2,8 +2,7 @@ tversky-index
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
-> calculate the Tversky similarity measure between two sets
-
+> calculate the Tversky similarity measure between two sets or two strings
 
 ## Installation
 
@@ -13,24 +12,41 @@ $ npm install compute-tversky-index
 
 For use in the browser, use [browserify](https://github.com/substack/node-browserify).
 
-
 ## Usage
 
 To use the module,
 
 ``` javascript
-var foo = require( 'compute-tversky-index' );
+var tversky = require( 'compute-tversky-index' );
 ```
 
-#### foo( arr )
+#### tversky( elem1, elem2, [alpha, beta] )
 
-What does this function do?
-
+This function calculates the [Tversky index](http://en.wikipedia.org/wiki/Tversky_index)
+between the two sets `elem1` and `elem2`.
+The Tversky index is an asymmetric similarity measure, which for tuning parameters
+`alpha` = `beta` = 1 produces the Tanimoto coefficient and for `alpha` = `beta` = 0.5
+is equal to Dice's coefficient. The `alpha` and `beta` parameters default to the value
+one if not supplied when calling the function.
+When `elem1` and `elem2` are strings, the Tversky coefficient is calculated using bigrams.
 
 ## Examples
 
 ``` javascript
-var foo = require( 'compute-tversky-index' );
+var tversky = require( 'compute-tversky-index' );
+
+var set1 = [2, 5, 7, 9];
+var set2 = [3, 5, 7, 11];
+
+tversky( set1, set2 );
+// returns 1 / 3
+
+var string1 = 'Harry';
+var string2 =  'Hans';
+
+tversky( string1, string2, 0.5, 0.5 );
+// 0.2857142857142857
+
 ```
 
 To run the example code from the top-level application directory,
@@ -38,7 +54,6 @@ To run the example code from the top-level application directory,
 ``` bash
 $ node ./examples/index.js
 ```
-
 
 ## Tests
 
@@ -70,7 +85,7 @@ $ make view-cov
 
 ## License
 
-[MIT license](http://opensource.org/licenses/MIT). 
+[MIT license](http://opensource.org/licenses/MIT).
 
 
 ---

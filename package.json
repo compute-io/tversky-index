@@ -31,7 +31,8 @@
     "url": "https://github.com/compute-io/tversky-index/issues"
   },
   "dependencies": {
-    "intersect": "^0.1.0"
+    "intersect": "^0.1.0",
+    "n-gram": "^0.1.2"
   },
   "devDependencies": {
     "chai": "1.x.x",
