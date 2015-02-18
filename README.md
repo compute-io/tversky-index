@@ -1,8 +1,11 @@
-tversky-index
+Tversky Index
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
-> calculate the Tversky similarity measure between two sets or two strings
+> Computes the [Tversky index](http://en.wikipedia.org/wiki/Tversky_index) between two sequences.
+
+The [Tversky index](http://en.wikipedia.org/wiki/Tversky_index) is an asymmetric similarity measure between two sets, one defined the *prototype* and the other the *variant*. The measure has two tuning parameters: `alpha` and `beta`, which correspond to weights associated with the prototype and variant, respectively. For `alpha = beta = 1`, the index is equal to the [Tanimoto coefficient](http://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_coefficient_.28extended_Jaccard_coefficient.29). For `alpha = beta = 0.5`, the index is equal to [Dice's coefficient](http://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient).
+
 
 ## Installation
 
@@ -20,33 +23,62 @@ To use the module,
 var tversky = require( 'compute-tversky-index' );
 ```
 
-#### tversky( elem1, elem2, [alpha, beta] )
+#### tversky( a, b[, opts] )
 
-This function calculates the [Tversky index](http://en.wikipedia.org/wiki/Tversky_index)
-between the two sets `elem1` and `elem2`.
-The Tversky index is an asymmetric similarity measure, which for tuning parameters
-`alpha` = `beta` = 1 produces the Tanimoto coefficient and for `alpha` = `beta` = 0.5
-is equal to Dice's coefficient. The `alpha` and `beta` parameters default to the value
-one if not supplied when calling the function.
-When `elem1` and `elem2` are strings, the Tversky coefficient is calculated using bigrams.
+Computes the [Tversky index](http://en.wikipedia.org/wiki/Tversky_index)
+between two sequences `a` and `b`. `a` and `b` must be either both `arrays` or both `strings`.
+
+``` javascript
+var a, b, idx;
+
+// Arrays:
+a = [ 2, 5, 7, 9 ];
+b = [ 3, 5, 7, 11 ];
+
+idx = tversky( a, b );
+// returns 0.333...
+
+// Strings:
+a = 'Harry';
+b = 'Hans';
+
+idx = tversky( a, b );
+// returns 0.5
+```
+
+The method accepts the following options:
+
+*	`alpha`: weight of the prototype sequence. Must be greater than or equal to `0`. Default: `1`.
+*	`beta`: weight of the variant sequence. Must be greater than or equal to `0`. Default: `1`.
+*	`symmetric`: `boolean` flag indicating whether to compute a symmetric variant of the Tversky index. Default: `false`.
+*	`ignorecase`: `boolean` flag indicating whether to ignore case when computing the Tversky index between two `strings`. Default: `false`.
+
+To specify options, provide an options `object`:
+
+``` javascript
+var a, b, idx;
+
+a = 'Harry';
+b = 'hans';
+
+idx = tversky( a, b, {
+	'alpha': 0.8,
+	'beta': 2,
+	'ignorecase': true,
+	'symmetric': true
+});
+// returns 
+```
+
+__NOTE__: the module defines `a` and `b` as sequences, rather than sets, to facilitate more general application. Internally, unique sets are extracted from the sequences, and, from these sets, the index is computed.
+
 
 ## Examples
 
 ``` javascript
 var tversky = require( 'compute-tversky-index' );
 
-var set1 = [2, 5, 7, 9];
-var set2 = [3, 5, 7, 11];
-
-tversky( set1, set2 );
-// returns 1 / 3
-
-var string1 = 'Harry';
-var string2 =  'Hans';
-
-tversky( string1, string2, 0.5, 0.5 );
-// 0.2857142857142857
-
+// TODO: different examples than above.
 ```
 
 To run the example code from the top-level application directory,
@@ -83,12 +115,12 @@ $ make view-cov
 ```
 
 
+---
 ## License
 
 [MIT license](http://opensource.org/licenses/MIT).
 
 
----
 ## Copyright
 
 Copyright &copy; 2015. Philipp Burckhardt.
