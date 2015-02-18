@@ -2,14 +2,23 @@
 
 var tversky = require( './../lib' );
 
-var set1 = [2, 5, 7, 9];
-var set2 = [3, 5, 7, 11];
+var a,
+	b,
+	idx;
 
-tversky( set1, set2 );
-// returns 1 / 3
+// Compare two arrays:
+a = [2, 5, 7, 9];
+b = [3, 5, 7, 11];
 
-var string1 = 'Harry';
-var string2 =  'Hans';
+idx = tversky( a, b );
+console.log( idx );
 
-tversky( string1, string2, 0.5, 0.5 );
-// 0.2857142857142857
+// Compare two strings:
+a = 'Harry';
+b = 'Hans';
+
+idx = tversky( a, b, {
+	'alpha': 0.5,
+	'beta': 0.5
+});
+console.log( idx );

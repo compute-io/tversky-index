@@ -1,7 +1,7 @@
 {
   "name": "compute-tversky-index",
   "version": "0.0.0",
-  "description": "calculate the Tversky similarity measure between two sets",
+  "description": "Computes the Tversky index between two sequences.",
   "author": {
     "name": "Philipp Burckhardt",
     "email": "pburckhardt@outlook.com"
@@ -23,15 +23,21 @@
     "url": "git://github.com/compute-io/tversky-index.git"
   },
   "keywords": [
-    "similarity-measure",
-    "string-similarity"
+    "compute.io",
+    "compute",
+    "computation",
+    "similarity",
+    "dissimilarity",
+    "string",
+    "array",
+    "information theory",
+    "distance"
   ],
   "bugs": {
     "url": "https://github.com/compute-io/tversky-index/issues"
   },
   "dependencies": {
-    "intersect": "^0.1.0",
-    "n-gram": "^0.1.2"
+    "intersect": "^0.1.0"
   },
   "devDependencies": {
     "chai": "1.x.x",
