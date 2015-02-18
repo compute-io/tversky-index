@@ -51,7 +51,6 @@ The method accepts the following options:
 *	`alpha`: weight of the prototype sequence. Must be greater than or equal to `0`. Default: `1`.
 *	`beta`: weight of the variant sequence. Must be greater than or equal to `0`. Default: `1`.
 *	`symmetric`: `boolean` flag indicating whether to compute a symmetric variant of the Tversky index. Default: `false`.
-*	`ignorecase`: `boolean` flag indicating whether to ignore case when computing the Tversky index between two `strings`. Default: `false`.
 
 To specify options, provide an options `object`:
 
@@ -64,7 +63,6 @@ b = 'hans';
 idx = tversky( a, b, {
 	'alpha': 0.8,
 	'beta': 2,
-	'ignorecase': true,
 	'symmetric': true
 });
 // returns 
