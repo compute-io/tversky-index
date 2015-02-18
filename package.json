@@ -23,9 +23,8 @@
     "url": "git://github.com/compute-io/tversky-index.git"
   },
   "keywords": [
-    "compute.io",
-    "compute",
-    "computation"
+    "similarity-measure",
+    "string-similarity"
   ],
   "bugs": {
     "url": "https://github.com/compute-io/tversky-index/issues"
