@@ -44,8 +44,8 @@ describe( 'compute-tversky-index', function tests() {
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i], 'a' ) ).to.throw( TypeError );
-			expect( badValue( 'a', values[i] ) ).to.throw( TypeError );
+			expect( badValue( values[i], 'a' ) ).to.throw( Error );
+			expect( badValue( 'a', values[i] ) ).to.throw( Error );
 		}
 
 		values = [
@@ -65,17 +65,38 @@ describe( 'compute-tversky-index', function tests() {
 
 	});
 
+	it( 'should throw an error if options parameter is not an object', function test(){
+		var values = [
+			true,
+			0.2,
+			'symmetric',
+		];
+
+		for ( var i = 0; i < values.length; i++ ) {
+			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[i] ) ).to.throw( Error );
+		}
+		function badValue(val) {
+			return function() {
+				tversky( 'abc', 'cde', val );
+			};
+		}
+	});
+
 	it( 'should throw an error if supplied tuning parameters are < 0', function test() {
 		expect( badValue( -0.3, 0.3 ) ).to.throw( RangeError );
 		expect( badValue(0.3, -0.3) ).to.throw( RangeError );
 		function badValue(val1, val2) {
 			return function() {
-				tversky( 'abc', 'cde', val1, val2 );
+				tversky( 'abc', 'cde', {
+					alpha: val1,
+					beta: val2
+				} );
 			};
 		}
 	});
 
-	it( 'should throw an error if supplied tuning parameters are non-numeric', function test() {
+	it( 'should throw an error if supplied tuning parameter alpha is non-numeric', function test() {
 
 		var values = [
 			true,
@@ -85,12 +106,66 @@ describe( 'compute-tversky-index', function tests() {
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i], 0.5 ) ).to.throw( TypeError );
-			expect( badValue( 0.5, values[i] ) ).to.throw( TypeError );
+			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[i] ) ).to.throw( Error );
 		}
-		function badValue(val1, val2) {
+		function badValue(val) {
 			return function() {
-				tversky( 'abc', 'cde', val1, val2 );
+				tversky( 'abc', 'cde', {
+					alpha: val,
+					beta: 0.5
+				} );
+			};
+		}
+
+	});
+
+	it( 'should throw an error if supplied tuning parameter beta is non-numeric', function test() {
+
+		var values = [
+			true,
+			[],
+			function(){},
+			{}
+		];
+
+		for ( var i = 0; i < values.length; i++ ) {
+			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[i] ) ).to.throw( Error );
+		}
+		function badValue(val) {
+			return function() {
+				tversky( 'abc', 'cde', {
+					alpha: 0.5,
+					beta: val
+				} );
+			};
+		}
+
+	});
+
+	it( 'should throw an error if symmetric key of options object is non-Boolean', function test() {
+
+		var values = [
+			5,
+			'yes',
+			undefined,
+			null,
+			NaN,
+			function(){},
+			{},
+			[]
+		];
+
+		for ( var i = 0; i < values.length; i++ ) {
+			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[i] ) ).to.throw( Error );
+		}
+		function badValue(val) {
+			return function() {
+				tversky( 'abc', 'cde', {
+					'symmetric': val
+				} );
 			};
 		}
 
@@ -109,14 +184,50 @@ describe( 'compute-tversky-index', function tests() {
 	});
 
 	it( 'should compute the Tversky similarity for custom tuning params', function test() {
-		var set1, set2, expected;
+		var set1, set2, expected, options;
 
 		set1 = [2, 5, 7, 9];
 		set2 = [3, 5, 7, 11];
 
 		expected = 2 / 4;
 
-		assert.strictEqual( tversky( set1, set2, 0.5, 0.5 ), expected );
+		options = {
+			'alpha' : 0.5,
+			'beta'  : 0.5
+		};
+
+		assert.strictEqual( tversky( set1, set2, options ), expected );
+
+	});
+
+	it( 'should compute the symmetric Tversky similarity', function test(){
+		var set1, set2, expected, options;
+
+		set1 = [2, 3, 5, 7, 9];
+		set2 = [2, 3, 5, 7, 11, 4];
+
+		expected = 4 / ( 4 + 0.5 * (0.5*1 + 0.5*2) );
+
+		options = {
+			'alpha' : 0.5,
+			'beta'  : 0.5,
+			'symmetric': true
+		};
+
+		assert.strictEqual( tversky( set1, set2, options ), expected );
+
+		set1 = [2, 5, 8];
+		set2 = [2, 5];
+
+		expected = 2 / ( 2 + 0.5 * (0.5*1 + 0.5*0) );
+
+		options = {
+			'alpha' : 0.5,
+			'beta'  : 0.5,
+			'symmetric': true
+		};
+
+		assert.strictEqual( tversky( set1, set2, options ), expected );
 
 	});
 
@@ -127,7 +238,7 @@ describe( 'compute-tversky-index', function tests() {
 		string1 = 'Harry';
 		string2 =  'Hans';
 
-		expected = 0.16666666666666666;
+		expected = 1 / 3;
 
 		assert.strictEqual( tversky( string1, string2 ), expected );
 
@@ -135,14 +246,19 @@ describe( 'compute-tversky-index', function tests() {
 
 	it( 'should compute the Tversky similarity for custom tuning params', function test() {
 
-		var string1, string2, expected;
+		var string1, string2, expected, options;
 
 		string1 = 'Harry';
 		string2 =  'Hans';
 
-		expected = 0.2857142857142857;
+		expected = 1 / 2;
 
-		assert.strictEqual( tversky( string1, string2, 0.5, 0.5 ), expected );
+		options =  {
+			'alpha' : 0.5,
+			'beta'  : 0.5
+		};
+
+		assert.strictEqual( tversky( string1, string2, options ), expected );
 
 	});
 
