@@ -25,13 +25,6 @@ describe( 'compute-tversky-index', function tests() {
 	});
 
 	it( 'should throw an error if not provided two strings or two arrays', function test() {
-
-		function badValue( val1, val2 ) {
-			return function() {
-				tversky( val1, val2 );
-			};
-		}
-
 		var values = [
 			5,
 			true,
@@ -44,11 +37,11 @@ describe( 'compute-tversky-index', function tests() {
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i], 'a' ) ).to.throw( Error );
-			expect( badValue( 'a', values[i] ) ).to.throw( Error );
+			expect( badValue( values[ i ], 'a' ) ).to.throw( Error );
+			expect( badValue( 'a', values[ i ] ) ).to.throw( Error );
 		}
-
 		values = [
+			5,
 			'abc',
 			true,
 			undefined,
@@ -59,96 +52,92 @@ describe( 'compute-tversky-index', function tests() {
 		];
 
 		for ( var j = 0; j < values.length; j++ ) {
-			expect( badValue( values[i], [1, 2] ) ).to.throw( TypeError );
-			expect( badValue( [1, 2], values[i] ) ).to.throw( TypeError );
+			expect( badValue( values[ i ], [1, 2] ) ).to.throw( TypeError );
+			expect( badValue( [1, 2], values[ i ] ) ).to.throw( TypeError );
 		}
-
+		function badValue( val1, val2 ) {
+			return function() {
+				tversky( val1, val2 );
+			};
+		}
 	});
 
-	it( 'should throw an error if options parameter is not an object', function test(){
+	it( 'should throw an error if `options` is not an object', function test(){
 		var values = [
+			'',
+			5,
+			null,
+			undefined,
+			NaN,
 			true,
-			0.2,
-			'symmetric',
+			function(){},
+			[]
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i] ) ).to.throw( Error );
-			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue(val) {
+		function badValue( val ) {
 			return function() {
 				tversky( 'abc', 'cde', val );
 			};
 		}
 	});
 
-	it( 'should throw an error if supplied tuning parameters are < 0', function test() {
-		expect( badValue( -0.3, 0.3 ) ).to.throw( RangeError );
-		expect( badValue(0.3, -0.3) ).to.throw( RangeError );
-		function badValue(val1, val2) {
-			return function() {
-				tversky( 'abc', 'cde', {
-					alpha: val1,
-					beta: val2
-				} );
-			};
-		}
-	});
-
-	it( 'should throw an error if supplied tuning parameter alpha is non-numeric', function test() {
-
+	it( 'should throw an error if `alpha` option is not a nonnegative number', function test() {
 		var values = [
+			-1,
+			'',
 			true,
-			[],
+			null,
+			undefined,
 			function(){},
+			[],
 			{}
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i] ) ).to.throw( Error );
-			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue(val) {
+		function badValue( val ) {
 			return function() {
 				tversky( 'abc', 'cde', {
-					alpha: val,
-					beta: 0.5
+					'alpha': val,
+					'beta': 0.5
 				} );
 			};
 		}
-
 	});
 
-	it( 'should throw an error if supplied tuning parameter beta is non-numeric', function test() {
-
+	it( 'should throw an error if `beta` option is a nonnegative number', function test() {
 		var values = [
+			-1,
+			'',
 			true,
-			[],
+			null,
+			undefined,
 			function(){},
+			[],
 			{}
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i] ) ).to.throw( Error );
-			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue(val) {
+		function badValue( val ) {
 			return function() {
 				tversky( 'abc', 'cde', {
-					alpha: 0.5,
-					beta: val
+					'alpha': 0.5,
+					'beta': val
 				} );
 			};
 		}
-
 	});
 
-	it( 'should throw an error if symmetric key of options object is non-Boolean', function test() {
-
+	it( 'should throw an error if `symmetric` option is not a boolean', function test() {
 		var values = [
 			5,
-			'yes',
+			'',
 			undefined,
 			null,
 			NaN,
@@ -158,20 +147,18 @@ describe( 'compute-tversky-index', function tests() {
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[i] ) ).to.throw( Error );
-			expect( badValue( values[i] ) ).to.throw( Error );
+			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue(val) {
+		function badValue( val ) {
 			return function() {
 				tversky( 'abc', 'cde', {
 					'symmetric': val
 				} );
 			};
 		}
-
 	});
 
-	it( 'should compute the Tversky similarity of arrays for default tuning params', function test() {
+	it( 'should compute the Tversky index', function test() {
 		var set1, set2, expected;
 
 		set1 = [2, 5, 7, 9];
@@ -180,10 +167,9 @@ describe( 'compute-tversky-index', function tests() {
 		expected = 2 / 6;
 
 		assert.strictEqual( tversky( set1, set2 ), expected );
-
 	});
 
-	it( 'should compute the Tversky similarity for custom tuning params', function test() {
+	it( 'should compute the Tversky index with custom weights', function test() {
 		var set1, set2, expected, options;
 
 		set1 = [2, 5, 7, 9];
@@ -195,12 +181,10 @@ describe( 'compute-tversky-index', function tests() {
 			'alpha' : 0.5,
 			'beta'  : 0.5
 		};
-
 		assert.strictEqual( tversky( set1, set2, options ), expected );
-
 	});
 
-	it( 'should compute the symmetric Tversky similarity', function test(){
+	it( 'should compute a modified symmetric Tversky index', function test(){
 		var set1, set2, expected, options;
 
 		set1 = [2, 3, 5, 7, 9];
@@ -226,40 +210,7 @@ describe( 'compute-tversky-index', function tests() {
 			'beta'  : 0.5,
 			'symmetric': true
 		};
-
 		assert.strictEqual( tversky( set1, set2, options ), expected );
-
-	});
-
-	it( 'should compute the Tversky similarity of strings for default tuning params', function test() {
-
-		var string1, string2, expected;
-
-		string1 = 'Harry';
-		string2 =  'Hans';
-
-		expected = 1 / 3;
-
-		assert.strictEqual( tversky( string1, string2 ), expected );
-
-	});
-
-	it( 'should compute the Tversky similarity for custom tuning params', function test() {
-
-		var string1, string2, expected, options;
-
-		string1 = 'Harry';
-		string2 =  'Hans';
-
-		expected = 1 / 2;
-
-		options =  {
-			'alpha' : 0.5,
-			'beta'  : 0.5
-		};
-
-		assert.strictEqual( tversky( string1, string2, options ), expected );
-
 	});
 
 });
