@@ -158,7 +158,7 @@ describe( 'compute-tversky-index', function tests() {
 		}
 	});
 
-	it( 'should compute the Tversky index', function test() {
+	it( 'should compute the Tversky index between two arrays', function test() {
 		var set1, set2, expected;
 
 		set1 = [2, 5, 7, 9];
@@ -169,7 +169,18 @@ describe( 'compute-tversky-index', function tests() {
 		assert.strictEqual( tversky( set1, set2 ), expected );
 	});
 
-	it( 'should compute the Tversky index with custom weights', function test() {
+	it( 'should compute the Tversky index between two strings', function test() {
+		var val1, val2, expected;
+
+		val1 = 'Harry';
+		val2 = 'Hans';
+
+		expected = 2 / 6;
+
+		assert.strictEqual( tversky( val1, val2 ), expected );
+	});
+
+	it( 'should compute the Tversky index between two arrays using custom weights', function test() {
 		var set1, set2, expected, options;
 
 		set1 = [2, 5, 7, 9];
@@ -182,6 +193,21 @@ describe( 'compute-tversky-index', function tests() {
 			'beta'  : 0.5
 		};
 		assert.strictEqual( tversky( set1, set2, options ), expected );
+	});
+
+	it( 'should compute the Tversky index between two strings using custom weights', function test() {
+		var val1, val2, expected, options;
+
+		val1 = 'Harry';
+		val2 = 'Hans';
+
+		expected = 2 / 4;
+
+		options = {
+			'alpha' : 0.5,
+			'beta'  : 0.5
+		};
+		assert.strictEqual( tversky( val1, val2, options ), expected );
 	});
 
 	it( 'should compute a modified symmetric Tversky index', function test(){
