@@ -102,9 +102,10 @@ describe( 'compute-tversky-index', function tests() {
 	it( 'should throw an error if `alpha` option is not a nonnegative number', function test() {
 		var values = [
 			-1,
-			'',
+			'5',
 			true,
 			null,
+			NaN,
 			undefined,
 			function(){},
 			[],
@@ -123,12 +124,13 @@ describe( 'compute-tversky-index', function tests() {
 		}
 	});
 
-	it( 'should throw an error if `beta` option is a nonnegative number', function test() {
+	it( 'should throw an error if `beta` option is not a nonnegative number', function test() {
 		var values = [
 			-1,
-			'',
+			'5',
 			true,
 			null,
+			NaN,
 			undefined,
 			function(){},
 			[],
