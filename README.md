@@ -118,7 +118,7 @@ for ( j = 0; j < numSeq; j++ ) {
 	// Randomly shuffle the data...
 	shuffle( data );
 
-	// Pick the first ten elements...
+	// Pick the first X elements...
 	seq[ j ] = data.slice( 0, len+1 );
 }
 
@@ -127,6 +127,7 @@ len = numSeq;
 indices = new Array( len );
 for ( i = 0; i < len; i++ ) {
 	indices[ i ] = new Array( len );
+	// Exclude indices between each sequence and itself...
 	indices[ i ][ i ] = NaN;
 }
 opts = {
