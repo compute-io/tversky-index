@@ -24,7 +24,7 @@ describe( 'compute-tversky-index', function tests() {
 		expect( tversky ).to.be.a( 'function' );
 	});
 
-	it( 'should throw an error if not provided two strings or two arrays', function test() {
+	it( 'should throw an error if the first argument is neither an array or a string', function test() {
 		var values = [
 			5,
 			true,
@@ -32,33 +32,48 @@ describe( 'compute-tversky-index', function tests() {
 			null,
 			NaN,
 			function(){},
-			{},
-			[]
+			{}
 		];
 
 		for ( var i = 0; i < values.length; i++ ) {
-			expect( badValue( values[ i ], 'a' ) ).to.throw( Error );
-			expect( badValue( 'a', values[ i ] ) ).to.throw( Error );
+			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		values = [
+		function badValue( value ) {
+			return function() {
+				tversky( value, 'a' );
+			};
+		}
+	});
+
+	it( 'should throw an error if the second argument is neither an array or a string', function test() {
+		var values = [
 			5,
-			'abc',
 			true,
 			undefined,
 			null,
 			NaN,
 			function(){},
-			{},
+			{}
 		];
 
-		for ( var j = 0; j < values.length; j++ ) {
-			expect( badValue( values[ i ], [1, 2] ) ).to.throw( TypeError );
-			expect( badValue( [1, 2], values[ i ] ) ).to.throw( TypeError );
+		for ( var i = 0; i < values.length; i++ ) {
+			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue( val1, val2 ) {
+		function badValue( value ) {
 			return function() {
-				tversky( val1, val2 );
+				tversky( 'a', value );
 			};
+		}
+	});
+
+	it( 'should throw an error if the input sequences are not of the same type', function test() {
+		expect( diffType1 ).to.throw( Error );
+		expect( diffType2 ).to.throw( Error );
+		function diffType1() {
+			tversky( [], 'a' );
+		}
+		function diffType2() {
+			tversky( 'a', [] );
 		}
 	});
 
@@ -77,9 +92,9 @@ describe( 'compute-tversky-index', function tests() {
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue( val ) {
+		function badValue( value ) {
 			return function() {
-				tversky( 'abc', 'cde', val );
+				tversky( '', '', value );
 			};
 		}
 	});
@@ -99,11 +114,10 @@ describe( 'compute-tversky-index', function tests() {
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue( val ) {
+		function badValue( value ) {
 			return function() {
 				tversky( 'abc', 'cde', {
-					'alpha': val,
-					'beta': 0.5
+					'alpha': value
 				} );
 			};
 		}
@@ -124,11 +138,10 @@ describe( 'compute-tversky-index', function tests() {
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue( val ) {
+		function badValue( value ) {
 			return function() {
 				tversky( 'abc', 'cde', {
-					'alpha': 0.5,
-					'beta': val
+					'beta': value
 				} );
 			};
 		}
@@ -149,94 +162,134 @@ describe( 'compute-tversky-index', function tests() {
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[ i ] ) ).to.throw( TypeError );
 		}
-		function badValue( val ) {
+		function badValue( value ) {
 			return function() {
 				tversky( 'abc', 'cde', {
-					'symmetric': val
+					'symmetric': value
 				} );
 			};
 		}
 	});
 
 	it( 'should compute the Tversky index between two arrays', function test() {
-		var set1, set2, expected;
+		var arr1, arr2, expected;
 
-		set1 = [2, 5, 7, 9];
-		set2 = [3, 5, 7, 11];
+		arr1 = [2, 5, 7, 9];
+		arr2 = [3, 5, 7, 11];
 
-		expected = 2 / 6;
+		expected = 2 / ( 2 + 1*2 + 1*2 );
 
-		assert.strictEqual( tversky( set1, set2 ), expected );
+		assert.strictEqual( tversky( arr1, arr2 ), expected );
 	});
 
 	it( 'should compute the Tversky index between two strings', function test() {
-		var val1, val2, expected;
+		var str1, str2, expected;
 
-		val1 = 'Harry';
-		val2 = 'Hans';
+		str1 = 'Harry';
+		str2 = 'Hans';
 
-		expected = 2 / 6;
+		expected = 2 / ( 2 + 1*2 + 1*2 );
 
-		assert.strictEqual( tversky( val1, val2 ), expected );
+		assert.strictEqual( tversky( str1, str2 ), expected );
 	});
 
 	it( 'should compute the Tversky index between two arrays using custom weights', function test() {
-		var set1, set2, expected, options;
+		var alpha = 0.5,
+			beta = 0.5,
+			arr1,
+			arr2,
+			expected,
+			options;
 
-		set1 = [2, 5, 7, 9];
-		set2 = [3, 5, 7, 11];
+		arr1 = [2, 5, 7, 9];
+		arr2 = [3, 5, 7, 11];
 
-		expected = 2 / 4;
+		expected = 2 / ( 2 + alpha*2 + beta*2 );
 
 		options = {
-			'alpha' : 0.5,
-			'beta'  : 0.5
+			'alpha' : alpha,
+			'beta'  : beta
 		};
-		assert.strictEqual( tversky( set1, set2, options ), expected );
+		assert.strictEqual( tversky( arr1, arr2, options ), expected );
 	});
 
 	it( 'should compute the Tversky index between two strings using custom weights', function test() {
-		var val1, val2, expected, options;
+		var alpha = 0.5,
+			beta = 0.5,
+			str1,
+			str2,
+			expected,
+			options;
 
-		val1 = 'Harry';
-		val2 = 'Hans';
+		str1 = 'Harry';
+		str2 = 'Hans';
 
-		expected = 2 / 4;
+		expected = 2 / ( 2 + alpha*2 + beta*2 );
 
 		options = {
-			'alpha' : 0.5,
-			'beta'  : 0.5
+			'alpha' : alpha,
+			'beta'  : beta
 		};
-		assert.strictEqual( tversky( val1, val2, options ), expected );
+		assert.strictEqual( tversky( str1, str2, options ), expected );
+	});
+
+	it( 'should return unity if both weights are set to 0', function test() {
+		var arr1, arr2, expected, options;
+
+		arr1 = [2, 5, 7, 9];
+		arr2 = [3, 5, 7, 11];
+
+		expected = 1;
+
+		options = {
+			'alpha' : 0,
+			'beta'  : 0
+		};
+		assert.strictEqual( tversky( arr1, arr2, options ), expected );
+	});
+
+	it( 'should return zero in the limit that one or both weights goes to infinity', function test() {
+		var arr1, arr2, expected, options;
+
+		arr1 = [2, 5, 7, 9];
+		arr2 = [3, 5, 7, 11];
+
+		expected = 0;
+
+		options = {
+			'alpha' : Number.POSITIVE_INFINITY,
+			'beta'  : 0
+		};
+		assert.strictEqual( tversky( arr1, arr2, options ), expected );
+
+		options = {
+			'alpha' : 0,
+			'beta'  : Number.POSITIVE_INFINITY
+		};
+		assert.strictEqual( tversky( arr1, arr2, options ), expected );
+
+		options = {
+			'alpha' : Number.POSITIVE_INFINITY,
+			'beta'  : Number.POSITIVE_INFINITY
+		};
+		assert.strictEqual( tversky( arr1, arr2, options ), expected );
 	});
 
 	it( 'should compute a modified symmetric Tversky index', function test(){
-		var set1, set2, expected, options;
+		var arr1, arr2, expected, options;
 
-		set1 = [2, 3, 5, 7, 9];
-		set2 = [2, 3, 5, 7, 11, 4];
+		arr1 = [2, 3, 5, 7, 9];
+		arr2 = [2, 3, 5, 7, 11, 4];
 
-		expected = 4 / ( 4 + 0.5 * (0.5*1 + 0.5*2) );
-
-		options = {
-			'alpha' : 0.5,
-			'beta'  : 0.5,
-			'symmetric': true
-		};
-
-		assert.strictEqual( tversky( set1, set2, options ), expected );
-
-		set1 = [2, 5, 8];
-		set2 = [2, 5];
-
-		expected = 2 / ( 2 + 0.5 * (0.5*1 + 0.5*0) );
+		expected = 4 / ( 4 + 1*(1*1 + (1-1)*2) );
 
 		options = {
-			'alpha' : 0.5,
-			'beta'  : 0.5,
 			'symmetric': true
 		};
-		assert.strictEqual( tversky( set1, set2, options ), expected );
+		assert.strictEqual( tversky( arr1, arr2, options ), expected );
+
+		// Should be symmetric...
+		assert.strictEqual( tversky( arr2, arr1, options ), expected );
 	});
 
 });

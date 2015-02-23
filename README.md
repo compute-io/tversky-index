@@ -4,7 +4,7 @@ Tversky Index
 
 > Computes the [Tversky index](http://en.wikipedia.org/wiki/Tversky_index) between two sequences.
 
-The [Tversky index](http://en.wikipedia.org/wiki/Tversky_index) is an asymmetric similarity measure between two sets, one defined the *prototype* and the other the *variant*. The measure has two tuning parameters: `alpha` and `beta`, which correspond to weights associated with the prototype and variant, respectively. For `alpha = beta = 1`, the index is equal to the [Tanimoto coefficient](http://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_coefficient_.28extended_Jaccard_coefficient.29). For `alpha = beta = 0.5`, the index is equal to [Dice's coefficient](http://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient).
+The [Tversky index](http://en.wikipedia.org/wiki/Tversky_index) is an asymmetric similarity measure between two sets, one defined the *prototype* and the other the *variant*. The measure has two parameters: `alpha` and `beta`, which correspond to weights associated with the prototype and variant, respectively. For `alpha = beta = 1`, the index is equal to the [Tanimoto coefficient](http://en.wikipedia.org/wiki/Jaccard_index#Tanimoto_coefficient_.28extended_Jaccard_coefficient.29). For `alpha = beta = 0.5`, the index is equal to [Dice's coefficient](http://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient).
 
 
 ## Installation
@@ -16,8 +16,6 @@ $ npm install compute-tversky-index
 For use in the browser, use [browserify](https://github.com/substack/node-browserify).
 
 ## Usage
-
-To use the module,
 
 ``` javascript
 var tversky = require( 'compute-tversky-index' );
@@ -65,7 +63,7 @@ idx = tversky( a, b, {
 	'beta': 2,
 	'symmetric': true
 });
-// returns 
+// returns 0.142857...
 ```
 
 
@@ -77,9 +75,77 @@ The module defines `a` and `b` as sequences, rather than sets, to facilitate mor
 ## Examples
 
 ``` javascript
-var tversky = require( 'compute-tversky-index' );
+var tversky = require( 'compute-tversky-index' ),
+	shuffle = require( 'compute-shuffle' ),
+	nanmean = require( 'compute-nanmean' );
 
-// TODO: different examples than above.
+// Adjustable variables...
+
+// How big should the population be from which random samples will be drawn? (the larger the population, the more likely that the population will explore all possible random variates)
+var numData = 20;
+
+// How many random samples should be drawn from the population?
+var numSeq = 100;
+
+// How big should the random samples be? (the smaller the sequence, the more likely individual sequences will vary from one another; for a sample size equal to the population, variation between samples will be zero => index = 1)
+var seqLen = 10;
+
+// How much should the random variates be allowed to vary? (the larger the value, the less likely a value will be repeated in the population data set, and thus, the more likely that sequences will vary)
+var max = 20;
+
+
+// Other variables...
+var data,
+	seq,
+	len,
+	indices,
+	opts,
+	means,
+	idx,
+	i,
+	j;
+
+// Simulate some data...
+data = new Array( numData );
+for ( i = 0; i < numData; i++ ) {
+	data[ i ] = Math.round( Math.random()*max );
+}
+
+// Generate random sequences...
+seq = new Array( numSeq );
+len = seqLen;
+for ( j = 0; j < numSeq; j++ ) {
+	// Randomly shuffle the data...
+	shuffle( data );
+
+	// Pick the first ten elements...
+	seq[ j ] = data.slice( 0, len+1 );
+}
+
+// Compute the modified (symmetric) Tversky index for each sequence pair...
+len = numSeq;
+indices = new Array( len );
+for ( i = 0; i < len; i++ ) {
+	indices[ i ] = new Array( len );
+	indices[ i ][ i ] = NaN;
+}
+opts = {
+	'symmetric': true
+};
+for ( i = 0; i < len-1; i++ ) {
+	for ( j = i+1; j < len; j++ ) {
+		idx = tversky( seq[ i ], seq[ j ], opts );
+		indices[ i ][ j ] = idx;
+		indices[ j ][ i ] = idx;
+	}
+}
+
+// Compute the mean index between all sequences...
+means = new Array( len );
+for ( i = 0; i < len; i++ ) {
+	means[ i ] = nanmean( indices[ i ] );
+}
+console.log( nanmean( means ) );
 ```
 
 To run the example code from the top-level application directory,
@@ -87,6 +153,7 @@ To run the example code from the top-level application directory,
 ``` bash
 $ node ./examples/index.js
 ```
+
 
 ## Tests
 
