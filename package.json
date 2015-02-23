@@ -1,6 +1,6 @@
 {
   "name": "compute-tversky-index",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Computes the Tversky index between two sequences.",
   "author": {
     "name": "Philipp Burckhardt",
